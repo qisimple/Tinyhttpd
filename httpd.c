@@ -22,7 +22,7 @@
 #include <strings.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <pthread.h>
+// #include <pthread.h>
 #include <sys/wait.h>
 #include <stdlib.h>
 
@@ -66,6 +66,7 @@ void accept_request(void *arg)
     char *query_string = NULL;
 
     numchars = get_line(client, buf, sizeof(buf));
+    printf("hello client\n");
     i = 0; j = 0;
     while (!ISspace(buf[i]) && (i < sizeof(method) - 1))
     {
@@ -278,7 +279,7 @@ void execute_cgi(int client, const char *path,
             sprintf(length_env, "CONTENT_LENGTH=%d", content_length);
             putenv(length_env);
         }
-        execl(path, NULL);
+        execl(path,path, NULL);
         exit(0);
     } else {    /* parent */
         close(cgi_output[1]);
@@ -487,7 +488,7 @@ int main(void)
     int client_sock = -1;
     struct sockaddr_in client_name;
     socklen_t  client_name_len = sizeof(client_name);
-    pthread_t newthread;
+    // pthread_t newthread;
 
     server_sock = startup(&port);
     printf("httpd running on port %d\n", port);
@@ -499,9 +500,9 @@ int main(void)
                 &client_name_len);
         if (client_sock == -1)
             error_die("accept");
-        /* accept_request(client_sock); */
-        if (pthread_create(&newthread , NULL, (void *)accept_request, (void *)&client_sock) != 0)
-            perror("pthread_create");
+         accept_request((void *)&client_sock); 
+        // if (pthread_create(&newthread , NULL, (void *)accept_request, (void *)&client_sock) != 0)
+        //     perror("pthread_create");
     }
 
     close(server_sock);
